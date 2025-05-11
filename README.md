@@ -7,9 +7,9 @@ install [rocky linux](https://download.rockylinux.org/pub/rocky/9/isos/x86_64/Ro
 
 
 extensions
-[hide top bar](https://extensions.gnome.org/extension/545/hide-top-bar/) 
-[disable gestures 2021](https://extensions.gnome.org/extension/4049/disable-gestures-2021/)
-[No overview at start-up](https://extensions.gnome.org/extension/4099/no-overview/)
+[hide top bar](https://extensions.gnome.org/extension/545/hide-top-bar/)  <br>
+[disable gestures 2021](https://extensions.gnome.org/extension/4049/disable-gestures-2021/)  <br>
+[No overview at start-up](https://extensions.gnome.org/extension/4099/no-overview/)  <br> 
 
 
 
