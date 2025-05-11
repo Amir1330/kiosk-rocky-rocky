@@ -26,38 +26,41 @@ EOF
 chmod 644 "$DESKTOP_FILE"
 echo "  → Created $DESKTOP_FILE"
 
-### 3) Download & unpack Chromium
+### 3) Download & unpack Chromium (owned by kiosk)
 DOWNLOAD_DIR="/home/kiosk"
 ZIP_NAME="chrome-linux.zip"
+ZIP_PATH="$DOWNLOAD_DIR/$ZIP_NAME"
 CHROME_SNAPSHOT_URL="https://commondatastorage.googleapis.com/chromium-browser-snapshots/Linux_x64/1458586/chrome-linux.zip"
 
-echo "• Downloading Chromium build to $DOWNLOAD_DIR/$ZIP_NAME..."
+echo "• Downloading Chromium build to $ZIP_PATH..."
 wget -q --show-progress -P "$DOWNLOAD_DIR" "$CHROME_SNAPSHOT_URL"
 
 echo "• Unzipping..."
-unzip -o "$DOWNLOAD_DIR/$ZIP_NAME" -d "$DOWNLOAD_DIR"
-sudo rm -f "$DOWNLOAD_DIR/$ZIP_NAME"
+unzip -o "$ZIP_PATH" -d "$DOWNLOAD_DIR"
 echo "  → Chromium unpacked to $DOWNLOAD_DIR/chrome-linux/"
 
-### 4) Run offregion script tasks last
+echo "• Removing ZIP archive..."
+rm -f "$ZIP_PATH"     # now owned by kiosk, so no sudo needed
+echo "  → Removed $ZIP_PATH"
+
+### 4) Run offregion script tasks under sudo
 echo "• Running offregion setup (group/user/perms)..."
 
 # 4.1 Create sysadmins group if needed
-if ! getent group sysadmins >/dev/null; then
+if ! sudo getent group sysadmins >/dev/null; then
   sudo groupadd sysadmins
   echo "  → Group 'sysadmins' created"
 else
   echo "  → Group 'sysadmins' already exists"
 fi
 
-# 4.2 Add user 'admin' to sysadmins, if needed
+# 4.2 Create or update user 'admin'
 if ! id -u admin >/dev/null 2>&1; then
-  sudo adduser admin
+  sudo adduser --gecos "" admin
   echo "  → User 'admin' created"
 else
   echo "  → User 'admin' already exists"
 fi
-
 sudo usermod -aG sysadmins admin
 echo "  → Added 'admin' to 'sysadmins' group"
 
