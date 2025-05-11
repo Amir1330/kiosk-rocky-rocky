@@ -36,7 +36,7 @@ wget -q --show-progress -P "$DOWNLOAD_DIR" "$CHROME_SNAPSHOT_URL"
 
 echo "• Unzipping..."
 unzip -o "$DOWNLOAD_DIR/$ZIP_NAME" -d "$DOWNLOAD_DIR"
-rm -f "$DOWNLOAD_DIR/$ZIP_NAME"
+sudo rm -f "$DOWNLOAD_DIR/$ZIP_NAME"
 echo "  → Chromium unpacked to $DOWNLOAD_DIR/chrome-linux/"
 
 ### 4) Run offregion script tasks last
