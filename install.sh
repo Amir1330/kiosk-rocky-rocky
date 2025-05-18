@@ -56,7 +56,7 @@ fi
 
 # 4.2 Create or update user 'admin'
 if ! id -u admin >/dev/null 2>&1; then
-  sudo adduser --gecos "" admin
+  sudo adduser admin
   echo "  → User 'admin' created"
 else
   echo "  → User 'admin' already exists"
