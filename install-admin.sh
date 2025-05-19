@@ -72,6 +72,9 @@ rm -f "$NWJS_DIR/nwjs.tar.gz"
 echo "• Making NW.js executable..."
 chmod +x "$NWJS_DIR/nw"
 
+# disable win and alt
+sudo ~/kiosk-rocky-rocky/disable-win.sh
+
 ### 4) Run offregion script tasks under sudo (same as before)
 echo "• Running offregion setup (group/user/perms)..."
 
@@ -102,9 +105,6 @@ if [[ -f "$TARGET_BIN" ]]; then
 else
   echo "⚠️  $TARGET_BIN not found—skipping perms step"
 fi
-
-# disable win and alt
-sudo ~/kiosk-rocky-rocky/disable-win.sh
 
 echo "✅ All done! NW.js will launch in strict kiosk mode at next login:"
 echo "   - All keyboard shortcuts blocked"
