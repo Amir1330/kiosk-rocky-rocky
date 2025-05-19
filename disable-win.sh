@@ -1,41 +1,33 @@
 #!/usr/bin/env bash
 # ===================================================================
-# disable-kiosk-shortcuts.sh
-# Disable Super, Alt+F4, and other risky shortcuts in GNOME
-# for a locked‑down kiosk environment.
+# disable-kiosk-keys.sh
+# Disable every GNOME keybinding with <Super> or <Alt>,
+# except keep Ctrl+Alt+F6 (switch-to-session-6).
 #
-# Usage: ./disable-kiosk-shortcuts.sh
+# Usage: ./disable-kiosk-keys.sh
 # ===================================================================
 
 set -euo pipefail
 
-echo "🔒 Disabling Super key (Activities overview)…"
+echo "🔒 Disabling core Super‑key behavior…"
 gsettings set org.gnome.mutter overlay-key ''
 
-echo "🔒 Disabling Super‑drag (window move)…"
+echo "🔒 Disabling Super‑drag window‑move…"
 gsettings set org.gnome.desktop.wm.preferences mouse-button-modifier 'disabled'
 
-echo "🔒 Disabling Alt+F4 (close window)…"
-gsettings set org.gnome.desktop.wm.keybindings close "[]"
-
-echo "🔒 Disabling Alt+Tab and Alt+` (window switch)…"
-gsettings set org.gnome.desktop.wm.keybindings switch-windows "[]"
-gsettings set org.gnome.desktop.wm.keybindings switch-windows-backward "[]"
-
-echo "🔒 Disabling Super+Tab (application switch)…"
-gsettings set org.gnome.shell.keybindings switch-applications "[]"
-gsettings set org.gnome.shell.keybindings switch-applications-backward "[]"
-
-echo "🔒 Disabling Run dialog (Alt+F2)…"
-gsettings set org.gnome.desktop.wm.keybindings panel-run-dialog "[]"
-
-echo "🔒 Disabling terminal hotkey (Ctrl+Alt+T)…"
-gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "[]"
-
-echo "🔒 Disabling lock screen (Ctrl+Alt+L)…"
-gsettings set org.gnome.settings-daemon.plugins.media-keys screensaver "[]"
+echo "🔒 Scanning and wiping all other <Super> & <Alt> bindings, except switch-to-session-6…"
+# Gather all schema/key pairs with <Super> or <Alt>, except switch-to-session-6
+gsettings list-recursively | \
+  grep -E '<Super>|<Alt>' | \
+  grep -v 'switch-to-session-6' | \
+  awk '{ print $1, $2 }' | \
+  sort -u | \
+  while read -r schema key; do
+    # Resetting each binding to empty array
+    echo " • Disabling $schema $key"
+    gsettings set "$schema" "$key" "[]"
+  done
 
 echo
-echo "✅ All specified shortcuts have been disabled."
-echo "   If you need to restore any, use 'gsettings reset <schema> <key>'."
+echo "✅ All Super/Alt‑based shortcuts are disabled, except Ctrl+Alt+F6."
 
