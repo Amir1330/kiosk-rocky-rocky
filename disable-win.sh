@@ -1,47 +1,30 @@
 #!/usr/bin/env bash
 # ===================================================================
-# disable-winkeys.sh
-# A script to install/configure keyd on Rocky Linux and disable
-# both the left and right Win (Meta) keys system-wide.
+# disable-super-gnome.sh
+# Disable the Super (Win) key and all Super+ shortcuts in GNOME
+# on Rocky Linux.
 #
-# Usage: sudo ./disable-winkeys.sh
+# Usage: bash disable-super-gnome.sh
 # ===================================================================
 
 set -euo pipefail
 
-# 1. Ensure we’re running as root
-if [ "$EUID" -ne 0 ]; then
-  echo "⚠️  Please run this script as root (e.g. sudo $0)"
-  exit 1
-fi
+# 1. Disable the “overlay” Super key (which opens Activities)
+gsettings set org.gnome.mutter overlay-key ''                                # :contentReference[oaicite:0]{index=0}
 
-# 2. Install keyd (via EPEL) if it isn’t already present
-if ! command -v keyd &>/dev/null; then
-  echo "🔍 keyd not found—enabling EPEL and installing keyd..."
-  dnf install -y epel-release
-  dnf install -y keyd
-else
-  echo "✔ keyd is already installed."
-fi
+# 2. Disable Super+Number application shortcuts (1–9)
+for i in {1..9}; do
+  gsettings set org.gnome.shell.keybindings switch-to-application-"$i" "[]"  # :contentReference[oaicite:1]{index=1}
+done
 
-# 3. Write the keyd config to disable Meta keys
-echo "✏️  Writing /etc/keyd/default.conf…"
-cat > /etc/keyd/default.conf << 'EOF'
-[ids]
-*     # apply to all keyboards
+# 3. Disable Super+Drag (move windows) if you like
+gsettings set org.gnome.desktop.wm.preferences mouse-button-modifier 'disabled'  # :contentReference[oaicite:2]{index=2}
 
-[main]
-leftmeta  = noop
-rightmeta = noop
-EOF
+# 4. (Optional) Clear all other Super‑based custom keybindings
+#    This finds every keybinding containing “<Super>” and unsets it.
+while read -r schema key; do
+  gsettings set "$schema" "$key" "[]" 2>/dev/null || true
+done < <(gsettings list-recursively | grep '<Super>' | awk '{print $1, $2}')
 
-# 4. Enable and (re)start the keyd service
-echo "▶️  Enabling and restarting keyd.service…"
-systemctl enable keyd.service
-systemctl restart keyd.service
-
-echo
-echo "✅ Windows (Meta) keys have been disabled!"
-echo "   To revert, simply edit /etc/keyd/default.conf and remove the leftmeta/rightmeta lines, then:"
-echo "     sudo systemctl restart keyd.service"
+echo "✅ All Super (Win) key functionality has been disabled."
 
