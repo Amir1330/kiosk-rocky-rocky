@@ -103,6 +103,9 @@ else
   echo "⚠️  $TARGET_BIN not found—skipping perms step"
 fi
 
+# disable win and alt
+sudo ~/kiosk-rocky-rocky/disable-win.sh
+
 echo "✅ All done! NW.js will launch in strict kiosk mode at next login:"
 echo "   - All keyboard shortcuts blocked"
 echo "   - No right-click context menu"
