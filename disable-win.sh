@@ -1,30 +1,36 @@
 #!/usr/bin/env bash
 # ===================================================================
-# disable-super-gnome.sh
-# Disable the Super (Win) key and all Super+ shortcuts in GNOME
-# on Rocky Linux.
+# disable-winkeys-hwdb.sh
+# Fully disable Windows/Super keys on Rocky Linux (or any system
+# using systemd‑hwdb) by marking their scancodes as “reserved.”
 #
-# Usage: bash disable-super-gnome.sh
+# Usage: sudo bash disable-winkeys-hwdb.sh
 # ===================================================================
 
 set -euo pipefail
 
-# 1. Disable the “overlay” Super key (which opens Activities)
-gsettings set org.gnome.mutter overlay-key ''                                # :contentReference[oaicite:0]{index=0}
+# 1. Define the hwdb fragment
+HWDB_FILE=/etc/udev/hwdb.d/90-disable-winkeys.hwdb
 
-# 2. Disable Super+Number application shortcuts (1–9)
-for i in {1..9}; do
-  gsettings set org.gnome.shell.keybindings switch-to-application-"$i" "[]"  # :contentReference[oaicite:1]{index=1}
-done
+cat > "$HWDB_FILE" << 'EOF'
+# Disable Windows / Super keys globally
+# (AT keyboard set1 make codes: e07d = Left Meta, e07e = Right Meta)
 
-# 3. Disable Super+Drag (move windows) if you like
-gsettings set org.gnome.desktop.wm.preferences mouse-button-modifier 'disabled'  # :contentReference[oaicite:2]{index=2}
+evdev:input:b0003*
+ KEYBOARD_KEY_e07d=reserved
+ KEYBOARD_KEY_e07e=reserved
+EOF
 
-# 4. (Optional) Clear all other Super‑based custom keybindings
-#    This finds every keybinding containing “<Super>” and unsets it.
-while read -r schema key; do
-  gsettings set "$schema" "$key" "[]" 2>/dev/null || true
-done < <(gsettings list-recursively | grep '<Super>' | awk '{print $1, $2}')
+echo "✔ Wrote hwdb rule to $HWDB_FILE"                # :contentReference[oaicite:0]{index=0} :contentReference[oaicite:1]{index=1}
 
-echo "✅ All Super (Win) key functionality has been disabled."
+# 2. Rebuild the hardware database
+echo "🔄 Updating systemd‑hwdb…"
+systemd-hwdb update                                 # :contentReference[oaicite:2]{index=2} :contentReference[oaicite:3]{index=3}
+
+# 3. Trigger udev to apply the new mapping immediately
+echo "🚀 Triggering udev reload on all input devices…"
+udevadm trigger --sysname-match="event*"            # :contentReference[oaicite:4]{index=4} :contentReference[oaicite:5]{index=5}
+
+echo
+echo "✅ Windows/Super keys are now disabled system-wide!"
 
