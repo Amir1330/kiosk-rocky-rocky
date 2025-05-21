@@ -1,4 +1,14 @@
-# Update osk.py with all required methods
+#!/bin/bash
+
+# Create directory structure
+mkdir -p ~/py-osk
+cd ~/py-osk
+
+# Install dependencies
+echo "Installing dependencies..."
+sudo dnf install -y python3-gobject gtk3
+
+# Create main application file
 cat > ~/py-osk/osk.py << 'EOL'
 #!/usr/bin/env python3
 import gi
@@ -14,13 +24,15 @@ class OnScreenKeyboard(Gtk.Application):
         self.current_layout = 0
         self.shift_state = False
         self.language = 0
-        
+        self.win = None
+        self.toggle_btn = None
+
         # Get screen dimensions
         display = Gdk.Display.get_default()
         monitor = display.get_primary_monitor() or display.get_monitor(0)
         self.geometry = monitor.get_geometry()
-        
-        # Keyboard layers
+
+        # Keyboard layouts
         self.main_layout = [
             ['q','w','e','r','t','y','u','i','o','p'],
             ['a','s','d','f','g','h','j','k','l'],
@@ -41,9 +53,13 @@ class OnScreenKeyboard(Gtk.Application):
         ]
 
     def do_activate(self):
+        GLib.idle_add(self.initialize_windows)
+
+    def initialize_windows(self):
         self.create_toggle_button()
         self.create_keyboard_window()
         GLib.timeout_add(100, self.keep_on_top)
+        return False
 
     def create_toggle_button(self):
         self.toggle_btn = Gtk.Window(type=Gtk.WindowType.TOPLEVEL)
@@ -65,7 +81,7 @@ class OnScreenKeyboard(Gtk.Application):
         self.win.set_keep_above(True)
         self.win.set_type_hint(Gdk.WindowTypeHint.UTILITY)
         
-        # Adaptive sizing
+        # Set adaptive size
         keyboard_height = 200
         self.win.set_default_size(self.geometry.width, keyboard_height)
         self.win.move(0, self.geometry.height - keyboard_height)
@@ -83,12 +99,6 @@ class OnScreenKeyboard(Gtk.Application):
         self.win.add(main_box)
         self.win.show_all()
 
-    # ADD THE MISSING METHOD HERE
-    def toggle_keyboard(self, button):
-        self.keyboard_visible = not self.keyboard_visible
-        self.win.set_visible(self.keyboard_visible)
-
-    # REST OF THE METHODS (create_row, create_main_layer, etc.)
     def create_row(self, keys, layout):
         row = Gtk.Box(spacing=3)
         for key in keys:
@@ -186,6 +196,10 @@ class OnScreenKeyboard(Gtk.Application):
         self.current_layout = layout
         self.stack.set_visible_child_name(["main", "symbols", "russian"][layout])
 
+    def toggle_keyboard(self, button):
+        self.keyboard_visible = not self.keyboard_visible
+        self.win.set_visible(self.keyboard_visible)
+
     def hide_keyboard(self, button):
         self.keyboard_visible = False
         self.win.hide()
@@ -197,11 +211,38 @@ class OnScreenKeyboard(Gtk.Application):
 
 if __name__ == "__main__":
     os.environ["GDK_BACKEND"] = "wayland"
-    keyboard = OnScreenKeyboard()
-    keyboard.run(None)
+    app = OnScreenKeyboard()
+    app.run(None)
 EOL
 
-# Set permissions and restart
+# Create wrapper script
+cat > ~/py-osk/start-osk.sh << 'EOL'
+#!/bin/bash
+export XDG_CURRENT_DESKTOP=GNOME
+export GDK_BACKEND=wayland
+python3 ~/py-osk/osk.py
+EOL
+
+# Create autostart entry
+mkdir -p ~/.config/autostart
+cat > ~/.config/autostart/py-osk.desktop << EOL
+[Desktop Entry]
+Type=Application
+Name=On-Screen Keyboard
+Exec=$HOME/py-osk/start-osk.sh
+StartupNotify=false
+Terminal=false
+EOL
+
+# Set permissions
+chmod +x ~/py-osk/start-osk.sh
 chmod +x ~/py-osk/osk.py
-pkill -f osk.py
-~/py-osk/start-osk.sh
+
+echo "Installation complete!"
+echo "The keyboard will:"
+echo "- Appear at the bottom of the screen"
+echo "- Take full width"
+echo "- Auto-start on login"
+echo "- Have a persistent toggle button (⌨) in bottom-right"
+echo
+echo "To start manually: ~/py-osk/start-osk.sh"
