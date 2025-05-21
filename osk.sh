@@ -270,7 +270,7 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   width: 100%;
   background: #f5f5f5;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-  padding: 12px;
+  padding: 10px;
   z-index: 999999;
   display: none;
   font-family: 'Roboto', sans-serif;
@@ -285,22 +285,22 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
 .keyboard-row {
   display: flex;
   justify-content: center;
-  margin: 6px 0;
+  margin: 5px 0;
   width: 100%;
-  max-width: 1600px;
+  max-width: 1400px;
   margin-left: auto;
   margin-right: auto;
-  gap: 6px;
+  gap: 5px;
 }
 
 .key {
-  min-width: 70px;
-  height: 70px;
+  min-width: 60px;
+  height: 60px;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   background: #ffffff;
   color: #333;
-  font-size: 24px;
+  font-size: 22px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -308,7 +308,7 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   transition: all 0.1s ease;
   user-select: none;
   flex: 1;
-  max-width: 100px;
+  max-width: 90px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   font-weight: 500;
 }
@@ -329,81 +329,81 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
 
 .key.space {
   flex: 4;
-  max-width: 400px;
+  max-width: 350px;
 }
 
 .key.shift {
   flex: 1.5;
-  max-width: 140px;
+  max-width: 120px;
   background: #e0e0e0;
 }
 
 .key.enter {
   flex: 1.5;
-  max-width: 140px;
+  max-width: 120px;
   background: #2196F3;
   color: white;
 }
 
 .key.backspace {
   flex: 1.5;
-  max-width: 140px;
+  max-width: 120px;
   background: #e0e0e0;
-  font-size: 28px;
+  font-size: 26px;
 }
 
 .key.lang-switch {
   flex: 1;
-  max-width: 100px;
+  max-width: 90px;
   background: #e0e0e0;
 }
 
 .key.symbol-switch {
   flex: 1;
-  max-width: 100px;
+  max-width: 90px;
   background: #e0e0e0;
 }
 
 .key.hide-keyboard {
   flex: 1;
-  max-width: 100px;
+  max-width: 90px;
   background: #e0e0e0;
 }
 
 /* Media queries for different screen sizes */
 @media screen and (min-width: 1920px) {
   .key {
-    min-width: 80px;
-    height: 80px;
-    font-size: 28px;
+    min-width: 70px;
+    height: 70px;
+    font-size: 26px;
   }
   
   .keyboard-row {
-    max-width: 2000px;
+    max-width: 1800px;
   }
 }
 
 @media screen and (min-width: 2560px) {
   .key {
-    min-width: 90px;
-    height: 90px;
-    font-size: 32px;
+    min-width: 80px;
+    height: 80px;
+    font-size: 30px;
   }
   
   .keyboard-row {
-    max-width: 2400px;
+    max-width: 2200px;
   }
 }
 
 @media screen and (min-width: 3840px) {
   .key {
-    min-width: 100px;
-    height: 100px;
-    font-size: 36px;
+    min-width: 90px;
+    height: 90px;
+    font-size: 34px;
   }
   
   .keyboard-row {
-    max-width: 2800px;
+    max-width: 2600px;
   }
 }
 EOL
