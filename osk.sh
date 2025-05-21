@@ -87,7 +87,7 @@ PyQt6
 EOF
 
 # 4. Install Python dependencies system-wide
-sudo pip install --break-system-packages PyQt6
+sudo pip install PyQt6
 
 # 5. Install ydotool
 sudo dnf install -y ydotool
