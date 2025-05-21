@@ -14,6 +14,7 @@ sudo dnf install -y python3-gobject gtk3
 cat > ~/py-osk/osk.py << 'EOL'
 #!/usr/bin/env python3
 import gi
+import os  # <-- THIS WAS MISSING
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
@@ -22,16 +23,16 @@ class OnScreenKeyboard(Gtk.Application):
     def __init__(self):
         super().__init__(application_id='org.example.OSK')
         self.keyboard_visible = True
-        self.current_layout = 0  # 0=main, 1=numbers, 2=russian
+        self.current_layout = 0
         self.shift_state = False
-        self.language = 0  # 0=english, 1=russian
+        self.language = 0
         
         # Get screen dimensions
         display = Gdk.Display.get_default()
         monitor = display.get_primary_monitor() or display.get_monitor(0)
         self.geometry = monitor.get_geometry()
         
-        # Keyboard layers (same as before)
+        # Keyboard layers (previous content)
         self.main_layout = [
             ['q','w','e','r','t','y','u','i','o','p'],
             ['a','s','d','f','g','h','j','k','l'],
@@ -96,7 +97,6 @@ class OnScreenKeyboard(Gtk.Application):
         self.win.add(main_box)
         self.win.show_all()
 
-    # [Keep all other methods the same as previous version]
 
 if __name__ == "__main__":
     os.environ["GDK_BACKEND"] = "wayland"
