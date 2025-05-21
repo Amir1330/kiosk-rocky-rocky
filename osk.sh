@@ -11,17 +11,9 @@ print_status() {
     echo -e "${GREEN}[+]${NC} $1"
 }
 
-print_error() {
-    echo -e "${RED}[!]${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[*]${NC} $1"
-}
-
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then 
-    print_error "Please run as root (sudo)"
+    echo -e "${RED}[!]${NC} Please run as root (sudo)"
     exit 1
 fi
 
@@ -29,34 +21,16 @@ fi
 CURRENT_USER=$SUDO_USER
 HOME_DIR="/home/$CURRENT_USER"
 
-print_status "Starting installation of On-Screen Keyboard RU/EN"
+print_status "Installing On-Screen Keyboard RU/EN"
 
-# Check if Chromium is installed
-if ! command -v chromium &> /dev/null; then
-    print_warning "Chromium not found. Installing..."
-    
-    # Add Chromium repository
-    dnf config-manager --set-enabled crb
-    dnf install -y epel-release
-    dnf install -y chromium chromium-headless chromedriver
-    
-    if [ $? -ne 0 ]; then
-        print_error "Failed to install Chromium"
-        exit 1
-    fi
-    print_status "Chromium installed successfully"
-fi
-
-# Create necessary directories
+# Create extension directory
 CHROME_DIR="$HOME_DIR/chrome-linux"
 EXTENSION_DIR="$CHROME_DIR/extensions"
 EXTENSION_ID="on-screen-keyboard-ru-en"
 
-print_status "Creating extension directory"
-mkdir -p "$EXTENSION_DIR/$EXTENSION_ID"
-
-# Create extension files
-print_status "Creating extension files"
+mkdir -p "$EXTENSION_DIR/$EXTENSION_ID/src"
+mkdir -p "$EXTENSION_DIR/$EXTENSION_ID/styles"
+mkdir -p "$EXTENSION_DIR/$EXTENSION_ID/assets"
 
 # Create manifest.json
 cat > "$EXTENSION_DIR/$EXTENSION_ID/manifest.json" << 'EOL'
@@ -93,11 +67,6 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/manifest.json" << 'EOL'
   }
 }
 EOL
-
-# Create directory structure
-mkdir -p "$EXTENSION_DIR/$EXTENSION_ID/src"
-mkdir -p "$EXTENSION_DIR/$EXTENSION_ID/styles"
-mkdir -p "$EXTENSION_DIR/$EXTENSION_ID/assets"
 
 # Create content.js
 cat > "$EXTENSION_DIR/$EXTENSION_ID/src/content.js" << 'EOL'
@@ -484,21 +453,19 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
 }
 EOL
 
-# Create simple icons (using base64 encoded PNGs)
+# Create simple icons
 print_status "Creating extension icons"
 
-# Create a simple keyboard icon (16x16)
+# Create a simple keyboard icon
 convert -size 16x16 xc:transparent -fill '#2196F3' -draw "circle 8,8 8,1" -fill white -draw "text 4,12 '⌨'" "$EXTENSION_DIR/$EXTENSION_ID/assets/icon16.png"
 convert -size 48x48 xc:transparent -fill '#2196F3' -draw "circle 24,24 24,3" -fill white -draw "text 12,36 '⌨'" "$EXTENSION_DIR/$EXTENSION_ID/assets/icon48.png"
 convert -size 128x128 xc:transparent -fill '#2196F3' -draw "circle 64,64 64,8" -fill white -draw "text 32,96 '⌨'" "$EXTENSION_DIR/$EXTENSION_ID/assets/icon128.png"
 
-# Set proper permissions
-print_status "Setting permissions"
+# Set permissions
 chown -R $CURRENT_USER:$CURRENT_USER "$EXTENSION_DIR/$EXTENSION_ID"
 chmod -R 755 "$EXTENSION_DIR/$EXTENSION_ID"
 
-# Create autostart entry
-print_status "Creating autostart entry"
+# Create autostart
 AUTOSTART_DIR="$HOME_DIR/.config/autostart"
 mkdir -p "$AUTOSTART_DIR"
 
@@ -512,10 +479,7 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 EOL
 
-# Set proper permissions for autostart file
 chown $CURRENT_USER:$CURRENT_USER "$AUTOSTART_DIR/chrome-extension-autostart.desktop"
 chmod 644 "$AUTOSTART_DIR/chrome-extension-autostart.desktop"
 
-print_status "Installation completed successfully!"
-print_status "Please restart Chromium to see the changes."
-print_warning "If you're using Wayland, make sure to restart your session for the autostart to take effect." 
+print_status "Installation completed! Restart Chromium to see the changes." 
