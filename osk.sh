@@ -89,11 +89,22 @@ EOF
 # 4. Install Python dependencies system-wide
 sudo pip install PyQt6
 
-# 5. Install ydotool (with EPEL if needed)
+# 5. Install ydotool (with EPEL if needed, or build from source)
 echo "Installing ydotool..."
-if ! rpm -q ydotool >/dev/null 2>&1; then
-    sudo dnf install -y epel-release
-    sudo dnf install -y ydotool
+if ! command -v ydotool >/dev/null 2>&1; then
+    sudo dnf install -y epel-release || true
+    if ! sudo dnf install -y ydotool; then
+        echo "ydotool not found in repos, building from source..."
+        sudo dnf install -y git cmake gcc-c++ libevdev-devel boost-devel libuinput-devel make
+        TMPDIR=$(mktemp -d)
+        git clone https://github.com/ReimuNotMoe/ydotool.git "$TMPDIR/ydotool"
+        cd "$TMPDIR/ydotool"
+        cmake .
+        make
+        sudo make install
+        cd ~
+        rm -rf "$TMPDIR"
+    fi
 fi
 
 # 6. Create autostart desktop entry
