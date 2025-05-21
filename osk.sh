@@ -62,42 +62,42 @@ const keyboardLayouts = {
     default: [
       ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
       ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-      ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.'],
-      ['SHIFT', 'ENTER', 'BACKSPACE', 'SPACE', '123', '🌐', '↓']
+      ['SHIFT', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'BACKSPACE'],
+      ['123', '🌐', ',', 'SPACE', '.', 'ENTER', '↓']
     ],
     shift: [
       ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
       ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-      ['Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.'],
-      ['SHIFT', 'ENTER', 'BACKSPACE', 'SPACE', '123', '🌐', '↓']
+      ['SHIFT', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
+      ['123', '🌐', ',', 'SPACE', '.', 'ENTER', '↓']
     ],
     symbols: [
       ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
       ['-', '=', '_', '+', '{', '}', '[', ']', '(', ')'],
       ['!', '@', '#', '$', '%', '^', '&', '*', '|', '\\'],
       ['/', '<', '>', ',', '.', '~', '`'],
-      ['SHIFT', 'ENTER', 'BACKSPACE', 'SPACE', 'ABC', '🌐', '↓']
+      ['ABC', '🌐', ',', 'SPACE', '.', 'ENTER', '↓']
     ]
   },
   ru: {
     default: [
       ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ'],
       ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э'],
-      ['я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', ','],
-      ['SHIFT', 'ENTER', 'BACKSPACE', 'SPACE', '123', '🌐', '↓']
+      ['SHIFT', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', 'BACKSPACE'],
+      ['123', '🌐', ',', 'SPACE', '.', 'ENTER', '↓']
     ],
     shift: [
       ['Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З', 'Х', 'Ъ'],
       ['Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж', 'Э'],
-      ['Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', '.', ','],
-      ['SHIFT', 'ENTER', 'BACKSPACE', 'SPACE', '123', '🌐', '↓']
+      ['SHIFT', 'Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', 'BACKSPACE'],
+      ['123', '🌐', ',', 'SPACE', '.', 'ENTER', '↓']
     ],
     symbols: [
       ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
       ['-', '=', '_', '+', '{', '}', '[', ']', '(', ')'],
       ['!', '@', '#', '$', '%', '^', '&', '*', '|', '\\'],
       ['/', '<', '>', ',', '.', '~', '`'],
-      ['SHIFT', 'ENTER', 'BACKSPACE', 'SPACE', 'ABC', '🌐', '↓']
+      ['ABC', '🌐', ',', 'SPACE', '.', 'ENTER', '↓']
     ]
   }
 };
@@ -161,7 +161,11 @@ class OnScreenKeyboard {
         if (key === '123' || key === 'ABC') keyButton.className += ' symbol-switch';
         if (key === '↓') keyButton.className += ' hide-keyboard';
         
-        keyButton.addEventListener('click', () => this.handleKeyPress(key));
+        keyButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.handleKeyPress(key);
+        });
         rowDiv.appendChild(keyButton);
       });
       
@@ -178,7 +182,12 @@ class OnScreenKeyboard {
         this.updateKeyboardLayout();
         break;
       case 'ENTER':
-        this.activeElement.value += '\n';
+        if (this.activeElement.tagName === 'TEXTAREA') {
+          this.activeElement.value += '\n';
+        } else {
+          this.activeElement.form?.submit();
+          this.hideKeyboard();
+        }
         break;
       case 'BACKSPACE':
         this.activeElement.value = this.activeElement.value.slice(0, -1);
@@ -230,7 +239,9 @@ class OnScreenKeyboard {
       }
     });
 
-    document.getElementById('osk-toggle').addEventListener('click', () => {
+    document.getElementById('osk-toggle').addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (this.isVisible) {
         this.hideKeyboard();
       } else {
@@ -245,7 +256,8 @@ class OnScreenKeyboard {
       if (!e.target.closest('.keyboard-container') && 
           !e.target.closest('.floating-button') && 
           e.target.tagName !== 'INPUT' && 
-          e.target.tagName !== 'TEXTAREA') {
+          e.target.tagName !== 'TEXTAREA' &&
+          !e.target.closest('select')) {
         this.hideKeyboard();
       }
     });
@@ -279,13 +291,14 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   left: 0;
   right: 0;
   width: 100%;
-  background: #ffffff;
+  background: #f5f5f5;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-  padding: 10px;
+  padding: 8px;
   z-index: 999999;
   display: none;
   font-family: 'Roboto', sans-serif;
   box-sizing: border-box;
+  border-top: 1px solid #e0e0e0;
 }
 
 .keyboard-container.visible {
@@ -295,38 +308,40 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
 .keyboard-row {
   display: flex;
   justify-content: center;
-  margin: 5px 0;
+  margin: 4px 0;
   width: 100%;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
+  gap: 4px;
 }
 
 .key {
-  min-width: 40px;
-  height: 40px;
-  margin: 3px;
+  min-width: 50px;
+  height: 50px;
   border: none;
-  border-radius: 5px;
-  background: #f0f0f0;
+  border-radius: 8px;
+  background: #ffffff;
   color: #333;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.1s ease;
   user-select: none;
   flex: 1;
-  max-width: 60px;
+  max-width: 70px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
 }
 
 .key:hover {
-  background: #e0e0e0;
+  background: #f0f0f0;
 }
 
 .key:active {
-  background: #d0d0d0;
+  background: #e0e0e0;
   transform: scale(0.95);
 }
 
@@ -341,42 +356,49 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
 }
 
 .key.shift {
-  flex: 2;
-  max-width: 120px;
+  flex: 1.5;
+  max-width: 100px;
+  background: #e0e0e0;
 }
 
 .key.enter {
-  flex: 2;
-  max-width: 120px;
+  flex: 1.5;
+  max-width: 100px;
+  background: #2196F3;
+  color: white;
 }
 
 .key.backspace {
-  flex: 2;
-  max-width: 120px;
+  flex: 1.5;
+  max-width: 100px;
+  background: #e0e0e0;
 }
 
 .key.lang-switch {
-  flex: 1.5;
-  max-width: 90px;
+  flex: 1;
+  max-width: 70px;
+  background: #e0e0e0;
 }
 
 .key.symbol-switch {
-  flex: 1.5;
-  max-width: 90px;
+  flex: 1;
+  max-width: 70px;
+  background: #e0e0e0;
 }
 
 .key.hide-keyboard {
-  flex: 1.5;
-  max-width: 90px;
+  flex: 1;
+  max-width: 70px;
+  background: #e0e0e0;
 }
 
 .floating-button {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
   background: #2196F3;
   color: white;
   border: none;
@@ -387,6 +409,7 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   justify-content: center;
   z-index: 1000000;
   transition: all 0.3s ease;
+  font-size: 24px;
 }
 
 .floating-button:hover {
@@ -398,16 +421,12 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   transform: scale(0.95);
 }
 
-.floating-button i {
-  font-size: 24px;
-}
-
 /* Media queries for different screen sizes */
 @media screen and (min-width: 1920px) {
   .key {
-    min-width: 50px;
-    height: 50px;
-    font-size: 20px;
+    min-width: 60px;
+    height: 60px;
+    font-size: 22px;
   }
   
   .keyboard-row {
@@ -417,9 +436,9 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
 
 @media screen and (min-width: 2560px) {
   .key {
-    min-width: 60px;
-    height: 60px;
-    font-size: 24px;
+    min-width: 70px;
+    height: 70px;
+    font-size: 26px;
   }
   
   .keyboard-row {
@@ -429,9 +448,9 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
 
 @media screen and (min-width: 3840px) {
   .key {
-    min-width: 70px;
-    height: 70px;
-    font-size: 28px;
+    min-width: 80px;
+    height: 80px;
+    font-size: 30px;
   }
   
   .keyboard-row {
