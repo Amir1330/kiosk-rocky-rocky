@@ -93,7 +93,7 @@ sudo pip install PyQt6
 echo "Installing ydotool..."
 if ! command -v ydotool >/dev/null 2>&1; then
     sudo dnf install -y epel-release || true
-    sudo dnf config-manager --set-enabled crb || sudo dnf config-manager --set-enabled powertools || true
+    sudo dnf config-manager --set-enabled crb
     sudo dnf install -y git cmake gcc-c++ libevdev-devel boost-devel uinput-devel make
     if ! sudo dnf install -y ydotool; then
         echo "ydotool not found in repos, building from source..."
