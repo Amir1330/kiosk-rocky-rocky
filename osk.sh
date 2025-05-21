@@ -89,8 +89,12 @@ EOF
 # 4. Install Python dependencies system-wide
 sudo pip install PyQt6
 
-# 5. Install ydotool
-sudo dnf install -y ydotool
+# 5. Install ydotool (with EPEL if needed)
+echo "Installing ydotool..."
+if ! rpm -q ydotool >/dev/null 2>&1; then
+    sudo dnf install -y epel-release
+    sudo dnf install -y ydotool
+fi
 
 # 6. Create autostart desktop entry
 mkdir -p "$HOME/.config/autostart"
