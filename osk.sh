@@ -293,7 +293,7 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   width: 100%;
   background: #f5f5f5;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-  padding: 8px;
+  padding: 12px;
   z-index: 999999;
   display: none;
   font-family: 'Roboto', sans-serif;
@@ -308,22 +308,22 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
 .keyboard-row {
   display: flex;
   justify-content: center;
-  margin: 4px 0;
+  margin: 6px 0;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1600px;
   margin-left: auto;
   margin-right: auto;
-  gap: 4px;
+  gap: 6px;
 }
 
 .key {
-  min-width: 50px;
-  height: 50px;
+  min-width: 70px;
+  height: 70px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   background: #ffffff;
   color: #333;
-  font-size: 18px;
+  font-size: 24px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -331,7 +331,7 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   transition: all 0.1s ease;
   user-select: none;
   flex: 1;
-  max-width: 70px;
+  max-width: 100px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   font-weight: 500;
 }
@@ -352,43 +352,43 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
 
 .key.space {
   flex: 4;
-  max-width: 300px;
+  max-width: 400px;
 }
 
 .key.shift {
   flex: 1.5;
-  max-width: 100px;
+  max-width: 140px;
   background: #e0e0e0;
 }
 
 .key.enter {
   flex: 1.5;
-  max-width: 100px;
+  max-width: 140px;
   background: #2196F3;
   color: white;
 }
 
 .key.backspace {
   flex: 1.5;
-  max-width: 100px;
+  max-width: 140px;
   background: #e0e0e0;
 }
 
 .key.lang-switch {
   flex: 1;
-  max-width: 70px;
+  max-width: 100px;
   background: #e0e0e0;
 }
 
 .key.symbol-switch {
   flex: 1;
-  max-width: 70px;
+  max-width: 100px;
   background: #e0e0e0;
 }
 
 .key.hide-keyboard {
   flex: 1;
-  max-width: 70px;
+  max-width: 100px;
   background: #e0e0e0;
 }
 
@@ -396,9 +396,9 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
   background: #2196F3;
   color: white;
   border: none;
@@ -409,7 +409,7 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   justify-content: center;
   z-index: 1000000;
   transition: all 0.3s ease;
-  font-size: 24px;
+  font-size: 32px;
 }
 
 .floating-button:hover {
@@ -424,21 +424,9 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
 /* Media queries for different screen sizes */
 @media screen and (min-width: 1920px) {
   .key {
-    min-width: 60px;
-    height: 60px;
-    font-size: 22px;
-  }
-  
-  .keyboard-row {
-    max-width: 1600px;
-  }
-}
-
-@media screen and (min-width: 2560px) {
-  .key {
-    min-width: 70px;
-    height: 70px;
-    font-size: 26px;
+    min-width: 80px;
+    height: 80px;
+    font-size: 28px;
   }
   
   .keyboard-row {
@@ -446,15 +434,27 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   }
 }
 
-@media screen and (min-width: 3840px) {
+@media screen and (min-width: 2560px) {
   .key {
-    min-width: 80px;
-    height: 80px;
-    font-size: 30px;
+    min-width: 90px;
+    height: 90px;
+    font-size: 32px;
   }
   
   .keyboard-row {
     max-width: 2400px;
+  }
+}
+
+@media screen and (min-width: 3840px) {
+  .key {
+    min-width: 100px;
+    height: 100px;
+    font-size: 36px;
+  }
+  
+  .keyboard-row {
+    max-width: 2800px;
   }
 }
 EOL
