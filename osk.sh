@@ -12,7 +12,9 @@ mkdir -p "$APPDIR"
 # 2. Write main app code
 cat > "$MAINFILE" <<'EOF'
 import sys
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QStackedWidget, QHBoxLayout, QGridLayout
+from PyQt6.QtWidgets import (
+    QApplication, QWidget, QVBoxLayout, QPushButton, QHBoxLayout, QGridLayout, QSizePolicy
+)
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QGuiApplication
 
@@ -38,15 +40,39 @@ class OnScreenKeyboard(QWidget):
         self.setStyleSheet("background: #f9f9f9; border-radius: 16px;")
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
-        # Placeholder for keyboard layers
-        self.keyboard_stack = QStackedWidget()
-        self.layout.addWidget(self.keyboard_stack)
-        # Placeholder for bottom row (space, enter, etc.)
-        self.bottom_row = QHBoxLayout()
-        self.layout.addLayout(self.bottom_row)
+        self.create_keyboard()
         self.resize_to_bottom()
-        # Listen for screen geometry changes
         QTimer.singleShot(100, self.resize_to_bottom)
+
+    def create_keyboard(self):
+        # QWERTY layout
+        keys = [
+            ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+            ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+            ["Z", "X", "C", "V", "B", "N", "M"],
+        ]
+        grid = QGridLayout()
+        for row, key_row in enumerate(keys):
+            for col, key in enumerate(key_row):
+                btn = QPushButton(key)
+                btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+                btn.setMinimumHeight(48)
+                btn.setStyleSheet("font-size: 20px; background: #fff; border-radius: 8px;")
+                grid.addWidget(btn, row, col)
+        self.layout.addLayout(grid)
+        # Bottom row: space and enter
+        bottom_row = QHBoxLayout()
+        space = QPushButton("Space")
+        space.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        space.setMinimumHeight(48)
+        space.setStyleSheet("font-size: 20px; background: #fff; border-radius: 8px;")
+        enter = QPushButton("Enter")
+        enter.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        enter.setMinimumHeight(48)
+        enter.setStyleSheet("font-size: 20px; background: #fff; border-radius: 8px;")
+        bottom_row.addWidget(space, 4)
+        bottom_row.addWidget(enter, 1)
+        self.layout.addLayout(bottom_row)
 
     def resize_to_bottom(self):
         screen = QGuiApplication.primaryScreen().geometry()
