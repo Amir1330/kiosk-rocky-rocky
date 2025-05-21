@@ -480,10 +480,5 @@ EOL
 chown $CURRENT_USER:$CURRENT_USER "$AUTOSTART_DIR/chrome-extension-autostart.desktop"
 chmod 644 "$AUTOSTART_DIR/chrome-extension-autostart.desktop"
 
-# Kill existing Chromium processes
-pkill chromium || true
-
-# Start Chromium with the extension
-su - $CURRENT_USER -c "chromium --enable-features=ExtensionsToolbarMenu --load-extension=\"$EXTENSION_DIR/$EXTENSION_ID\" --enable-extensions &"
 
 print_status "Installation completed! The keyboard should be working now." 
