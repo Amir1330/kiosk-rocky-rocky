@@ -62,13 +62,13 @@ const keyboardLayouts = {
     default: [
       ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
       ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-      ['SHIFT', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'BACKSPACE'],
+      ['SHIFT', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '⌫'],
       ['123', '🌐', ',', 'SPACE', '.', 'ENTER', '↓']
     ],
     shift: [
       ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
       ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-      ['SHIFT', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
+      ['SHIFT', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫'],
       ['123', '🌐', ',', 'SPACE', '.', 'ENTER', '↓']
     ],
     symbols: [
@@ -83,13 +83,13 @@ const keyboardLayouts = {
     default: [
       ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ'],
       ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э'],
-      ['SHIFT', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', 'BACKSPACE'],
+      ['SHIFT', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '⌫'],
       ['123', '🌐', ',', 'SPACE', '.', 'ENTER', '↓']
     ],
     shift: [
       ['Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З', 'Х', 'Ъ'],
       ['Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж', 'Э'],
-      ['SHIFT', 'Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', 'BACKSPACE'],
+      ['SHIFT', 'Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', '⌫'],
       ['123', '🌐', ',', 'SPACE', '.', 'ENTER', '↓']
     ],
     symbols: [
@@ -114,7 +114,6 @@ class OnScreenKeyboard {
 
   init() {
     this.createKeyboard();
-    this.createFloatingButton();
     this.addEventListeners();
   }
 
@@ -124,14 +123,6 @@ class OnScreenKeyboard {
     container.id = 'osk-container';
     document.body.appendChild(container);
     this.updateKeyboardLayout();
-  }
-
-  createFloatingButton() {
-    const button = document.createElement('button');
-    button.className = 'floating-button';
-    button.innerHTML = '⌨️';
-    button.id = 'osk-toggle';
-    document.body.appendChild(button);
   }
 
   updateKeyboardLayout() {
@@ -156,7 +147,7 @@ class OnScreenKeyboard {
         if (key === 'SPACE') keyButton.className += ' space';
         if (key === 'SHIFT') keyButton.className += ' shift';
         if (key === 'ENTER') keyButton.className += ' enter';
-        if (key === 'BACKSPACE') keyButton.className += ' backspace';
+        if (key === '⌫') keyButton.className += ' backspace';
         if (key === '🌐') keyButton.className += ' lang-switch';
         if (key === '123' || key === 'ABC') keyButton.className += ' symbol-switch';
         if (key === '↓') keyButton.className += ' hide-keyboard';
@@ -189,7 +180,7 @@ class OnScreenKeyboard {
           this.hideKeyboard();
         }
         break;
-      case 'BACKSPACE':
+      case '⌫':
         this.activeElement.value = this.activeElement.value.slice(0, -1);
         break;
       case 'SPACE':
@@ -239,22 +230,8 @@ class OnScreenKeyboard {
       }
     });
 
-    document.getElementById('osk-toggle').addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (this.isVisible) {
-        this.hideKeyboard();
-      } else {
-        const activeElement = document.activeElement;
-        if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
-          this.showKeyboard(activeElement);
-        }
-      }
-    });
-
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.keyboard-container') && 
-          !e.target.closest('.floating-button') && 
           e.target.tagName !== 'INPUT' && 
           e.target.tagName !== 'TEXTAREA' &&
           !e.target.closest('select')) {
@@ -372,6 +349,7 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   flex: 1.5;
   max-width: 140px;
   background: #e0e0e0;
+  font-size: 28px;
 }
 
 .key.lang-switch {
@@ -390,35 +368,6 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
   flex: 1;
   max-width: 100px;
   background: #e0e0e0;
-}
-
-.floating-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 80px;
-  height: 80px;
-  border-radius: 40px;
-  background: #2196F3;
-  color: white;
-  border: none;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000000;
-  transition: all 0.3s ease;
-  font-size: 32px;
-}
-
-.floating-button:hover {
-  background: #1976D2;
-  transform: scale(1.05);
-}
-
-.floating-button:active {
-  transform: scale(0.95);
 }
 
 /* Media queries for different screen sizes */
