@@ -6,6 +6,8 @@ MAINFILE="$APPDIR/osk_main.py"
 REQUIREMENTS="$APPDIR/requirements.txt"
 DESKTOP_FILE="$HOME/.config/autostart/on-screen-keyboard-ru-en.desktop"
 
+sudo dnf install -y python3-pip
+
 # 1. Create app directory
 mkdir -p "$APPDIR"
 
@@ -78,7 +80,7 @@ PyQt6
 EOF
 
 # 4. Install Python dependencies system-wide
-sudo pip install --break-system-packages PyQt6
+sudo pip install PyQt6
 
 # 5. Install ydotool
 sudo dnf install -y ydotool
