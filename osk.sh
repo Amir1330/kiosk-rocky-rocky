@@ -16,6 +16,7 @@ import gi
 import subprocess
 import os
 gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 
 class OnScreenKeyboard(Gtk.Application):
@@ -52,19 +53,24 @@ class OnScreenKeyboard(Gtk.Application):
         GLib.timeout_add(100, self.keep_on_top)
 
     def create_toggle_button(self):
-        self.toggle_btn = Gtk.Window(type=Gtk.WindowType.POPUP)
-        self.toggle_btn.set_default_size(40, 40)
+        self.toggle_btn = Gtk.Window(type=Gtk.WindowType.TOPLEVEL)
         self.toggle_btn.set_title("OSK Toggle")
         self.toggle_btn.set_decorated(False)
         self.toggle_btn.set_skip_taskbar_hint(True)
         self.toggle_btn.set_keep_above(True)
+        self.toggle_btn.set_type_hint(Gdk.WindowTypeHint.UTILITY)
+        
+        # Get modern screen dimensions
+        display = Gdk.Display.get_default()
+        monitor = display.get_primary_monitor() or display.get_monitor(0)
+        geometry = monitor.get_geometry()
         
         btn = Gtk.Button(label="⌨")
         btn.connect("clicked", self.toggle_keyboard)
         self.toggle_btn.add(btn)
         
-        screen = Gdk.Screen.get_default()
-        self.toggle_btn.move(screen.get_width() - 100, screen.get_height() - 100)
+        self.toggle_btn.set_default_size(40, 40)
+        self.toggle_btn.move(geometry.width - 100, geometry.height - 100)
         self.toggle_btn.show_all()
 
     def create_keyboard_window(self):
@@ -73,6 +79,7 @@ class OnScreenKeyboard(Gtk.Application):
         self.win.set_position(Gtk.WindowPosition.CENTER)
         self.win.set_keep_above(True)
         self.win.set_decorated(False)
+        self.win.set_type_hint(Gdk.WindowTypeHint.UTILITY)
         
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         
@@ -101,11 +108,9 @@ class OnScreenKeyboard(Gtk.Application):
     def create_main_layer(self):
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
         
-        # First row
         self.create_row(self.main_layout[0], box)
         self.create_row(self.main_layout[1], box)
         
-        # Third row
         shift = Gtk.Button(label="⇧")
         shift.connect("clicked", self.toggle_shift)
         row3 = Gtk.Box(spacing=3)
