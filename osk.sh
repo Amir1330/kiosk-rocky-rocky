@@ -3,7 +3,6 @@
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Function to print status messages
@@ -43,18 +42,6 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/manifest.json" << 'EOL'
     "activeTab",
     "storage"
   ],
-  "action": {
-    "default_icon": {
-      "16": "assets/icon16.png",
-      "48": "assets/icon48.png",
-      "128": "assets/icon128.png"
-    }
-  },
-  "icons": {
-    "16": "assets/icon16.png",
-    "48": "assets/icon48.png",
-    "128": "assets/icon128.png"
-  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -465,7 +452,7 @@ convert -size 128x128 xc:transparent -fill '#2196F3' -draw "circle 64,64 64,8" -
 chown -R $CURRENT_USER:$CURRENT_USER "$EXTENSION_DIR/$EXTENSION_ID"
 chmod -R 755 "$EXTENSION_DIR/$EXTENSION_ID"
 
-# Create autostart
+# Create autostart with command line flags
 AUTOSTART_DIR="$HOME_DIR/.config/autostart"
 mkdir -p "$AUTOSTART_DIR"
 
@@ -473,7 +460,7 @@ cat > "$AUTOSTART_DIR/chrome-extension-autostart.desktop" << EOL
 [Desktop Entry]
 Type=Application
 Name=On-Screen Keyboard RU/EN
-Exec=chromium --load-extension="$EXTENSION_DIR/$EXTENSION_ID"
+Exec=chromium --enable-features=ExtensionsToolbarMenu --load-extension="$EXTENSION_DIR/$EXTENSION_ID" --enable-extensions
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
@@ -482,4 +469,10 @@ EOL
 chown $CURRENT_USER:$CURRENT_USER "$AUTOSTART_DIR/chrome-extension-autostart.desktop"
 chmod 644 "$AUTOSTART_DIR/chrome-extension-autostart.desktop"
 
-print_status "Installation completed! Restart Chromium to see the changes." 
+# Kill existing Chromium processes
+pkill chromium || true
+
+# Start Chromium with the extension
+su - $CURRENT_USER -c "chromium --enable-features=ExtensionsToolbarMenu --load-extension=\"$EXTENSION_DIR/$EXTENSION_ID\" --enable-extensions &"
+
+print_status "Installation completed! The keyboard should be working now." 
