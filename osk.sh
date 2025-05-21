@@ -440,14 +440,6 @@ cat > "$EXTENSION_DIR/$EXTENSION_ID/styles/keyboard.css" << 'EOL'
 }
 EOL
 
-# Create simple icons
-print_status "Creating extension icons"
-
-# Create a simple keyboard icon
-convert -size 16x16 xc:transparent -fill '#2196F3' -draw "circle 8,8 8,1" -fill white -draw "text 4,12 '⌨'" "$EXTENSION_DIR/$EXTENSION_ID/assets/icon16.png"
-convert -size 48x48 xc:transparent -fill '#2196F3' -draw "circle 24,24 24,3" -fill white -draw "text 12,36 '⌨'" "$EXTENSION_DIR/$EXTENSION_ID/assets/icon48.png"
-convert -size 128x128 xc:transparent -fill '#2196F3' -draw "circle 64,64 64,8" -fill white -draw "text 32,96 '⌨'" "$EXTENSION_DIR/$EXTENSION_ID/assets/icon128.png"
-
 # Set permissions
 chown -R $CURRENT_USER:$CURRENT_USER "$EXTENSION_DIR/$EXTENSION_ID"
 chmod -R 755 "$EXTENSION_DIR/$EXTENSION_ID"
