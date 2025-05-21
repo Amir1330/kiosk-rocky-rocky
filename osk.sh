@@ -96,7 +96,7 @@ if ! command -v ydotool >/dev/null 2>&1; then
     sudo dnf config-manager --set-enabled crb || sudo dnf config-manager --set-enabled powertools || true
     if ! sudo dnf install -y ydotool; then
         echo "ydotool not found in repos, building from source..."
-        sudo dnf install -y git cmake gcc-c++ libevdev-devel boost-devel libuinput-devel make
+        sudo dnf install -y git cmake gcc-c++ libevdev-devel boost-devel uinput-devel make
         TMPDIR=$(mktemp -d)
         git clone https://github.com/ReimuNotMoe/ydotool.git "$TMPDIR/ydotool"
         cd "$TMPDIR/ydotool"
