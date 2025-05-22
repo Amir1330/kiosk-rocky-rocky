@@ -11,13 +11,13 @@ print_status() {
 }
 
 # Check if running as root
-if [ "$EUID" -ne 0 ]; then 
-    echo -e "${RED}[!]${NC} Please run as root (sudo)"
-    exit 1
-fi
+#if [ "$EUID" -ne 0 ]; then 
+#    echo -e "${RED}[!]${NC} Please run as root (sudo)"
+#    exit 1
+#fi
 
 # Get the current user
-CURRENT_USER=$SUDO_USER
+CURRENT_USER=$USER
 HOME_DIR="/home/$CURRENT_USER"
 
 print_status "Installing On-Screen Keyboard RU/EN"
@@ -411,23 +411,6 @@ EOL
 # Set permissions
 chown -R $CURRENT_USER:$CURRENT_USER "$EXTENSION_DIR/$EXTENSION_ID"
 chmod -R 755 "$EXTENSION_DIR/$EXTENSION_ID"
-
-# Create autostart with command line flags
-AUTOSTART_DIR="$HOME_DIR/.config/autostart"
-mkdir -p "$AUTOSTART_DIR"
-
-cat > "$AUTOSTART_DIR/chrome-extension-autostart.desktop" << EOL
-[Desktop Entry]
-Type=Application
-Name=On-Screen Keyboard RU/EN
-Exec=chromium --enable-features=ExtensionsToolbarMenu --load-extension="$EXTENSION_DIR/$EXTENSION_ID" --enable-extensions
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-EOL
-
-chown $CURRENT_USER:$CURRENT_USER "$AUTOSTART_DIR/chrome-extension-autostart.desktop"
-chmod 644 "$AUTOSTART_DIR/chrome-extension-autostart.desktop"
 
 
 print_status "Installation completed! The keyboard should be working now." 

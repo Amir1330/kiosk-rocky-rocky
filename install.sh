@@ -74,5 +74,8 @@ else
   echo "⚠️  $TARGET_BIN not found—skipping perms step"
 fi
 
+
+
+
 echo "✅ All done! At next login, Chromium will launch in kiosk mode at https://$URL"
 
