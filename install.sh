@@ -75,7 +75,7 @@ else
 fi
 
 
-
+~/kiosk-rocky-rocky/osk.sh
 
 echo "✅ All done! At next login, Chromium will launch in kiosk mode at https://$URL"
 
