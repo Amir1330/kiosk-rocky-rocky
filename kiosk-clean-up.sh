@@ -17,6 +17,8 @@ else
   echo "ℹ️  Autostart file not found: $AUTOSTART_FILE"
 fi
 
+rm -rf $HOME/.config/autostart
+
 ### 2) Remove downloaded Chromium directory and ZIP
 CHROME_DIR="/home/kiosk/chrome-linux"
 CHROME_ZIP="/home/kiosk/chrome-linux.zip"
