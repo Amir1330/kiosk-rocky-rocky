@@ -20,18 +20,7 @@ cat > "$DESKTOP_FILE" <<EOF
 [Desktop Entry]
 Type=Application
 Name=ChromiumKiosk
-Exec=/home/kiosk/chrome-linux/chrome \\
-  --kiosk \\
-  --noerrdialogs \\
-  --disable-infobars \\
-  --disable-save-password-bubble \\
-  --disable-features=AutofillServerCommunication \\
-  --password-store=basic \\
-  --incognito \\
-  --no-first-run \\
-  --disable-translate \\
-  --disable-popup-blocking \\
-  https://$URL
+Exec=/home/kiosk/chrome-linux/chrome --kiosk --noerrdialogs --disable-infobars --disable-save-password-bubble --disable-features=AutofillServerCommunication --password-store=basic --incognito --no-first-run --disable-translate --disable-popup-blocking https://$URL
 Terminal=false
 EOF
 
