@@ -8,6 +8,7 @@ if [[ -z "$URL" ]]; then
   exit 1
 fi
 
+
 ### 2) Create the autostart .desktop entry
 AUTOSTART_DIR="$HOME/.config/autostart"
 DESKTOP_FILE="$AUTOSTART_DIR/chromiumkiosk.desktop"
@@ -19,12 +20,24 @@ cat > "$DESKTOP_FILE" <<EOF
 [Desktop Entry]
 Type=Application
 Name=ChromiumKiosk
-Exec=/home/kiosk/chrome-linux/chrome --password-store=basic --kiosk --noerrdialogs --disable-infobars https://$URL
+Exec=/home/kiosk/chrome-linux/chrome \\
+  --kiosk \\
+  --noerrdialogs \\
+  --disable-infobars \\
+  --disable-save-password-bubble \\
+  --disable-features=AutofillServerCommunication \\
+  --password-store=basic \\
+  --incognito \\
+  --no-first-run \\
+  --disable-translate \\
+  --disable-popup-blocking \\
+  https://$URL
 Terminal=false
 EOF
 
 chmod 644 "$DESKTOP_FILE"
 echo "  → Created $DESKTOP_FILE"
+
 
 ### 3) Download & unpack Chromium (owned by kiosk)
 DOWNLOAD_DIR="/home/kiosk"
