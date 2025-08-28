@@ -1,25 +1,32 @@
 #!/bin/bash
-# Rotate GNOME Wayland display automatically
+# Rotate ILITEK Multi-Touch-V5000 touchscreen on Wayland (GNOME)
 
-# Find first monitor name
-MONITOR=$(gdbus call --session \
-  --dest org.gnome.Mutter.DisplayConfig \
-  --object-path /org/gnome/Mutter/DisplayConfig \
-  --method org.gnome.Mutter.DisplayConfig.GetResources \
-  | grep -o '"connector":"[^"]*"' | head -n1 | cut -d':' -f2 | tr -d '"')
+DEVICE="ILITEK Multi-Touch-V5000"
+EVENT="/dev/input/event7"
 
-# Transform values
 case "$1" in
-  normal)   TRANSFORM=0 ;;
-  right)    TRANSFORM=1 ;;
-  inverted) TRANSFORM=2 ;;
-  left)     TRANSFORM=3 ;;
-  *) echo "Usage: $0 {normal|right|inverted|left}"; exit 1 ;;
+  normal)
+    MATRIX="1 0 0 0 1 0 0 0 1"
+    ;;
+  right)
+    MATRIX="0 -1 1 1 0 0 0 0 1"
+    ;;
+  inverted)
+    MATRIX="-1 0 1 0 -1 1 0 0 1"
+    ;;
+  left)
+    MATRIX="0 1 0 -1 0 1 0 0 1"
+    ;;
+  *)
+    echo "Usage: $0 {normal|right|inverted|left}"
+    exit 1
+    ;;
 esac
 
-# Apply rotation (note the array + variant syntax!)
-gdbus call --session \
-  --dest org.gnome.Mutter.DisplayConfig \
-  --object-path /org/gnome/Mutter/DisplayConfig \
-  --method org.gnome.Mutter.DisplayConfig.ApplyMonitorsConfig \
-  1 "[{'x':0,'y':0,'scale':1,'primary':true,'transform':$TRANSFORM,'monitor_configs':[{'connector':'$MONITOR'}]}]" "{}"
+echo "Applying rotation '$1' to $DEVICE ($EVENT)"
+sudo udevadm hwdb --update
+sudo udevadm trigger $EVENT
+sudo libinput debug-events --device=$EVENT --verbose | head -n 5 &
+sleep 1
+sudo kill $!
+sudo libinput debug-events --device=$EVENT --set-calibration-matrix=$MATRIX
