@@ -1,8 +1,9 @@
 #!/bin/bash
-# Rotate ILITEK Multi-Touch-V5000 touchscreen on Wayland (GNOME)
+# Rotate ILITEK Multi-Touch-V5000 touchscreen persistently on Wayland (GNOME)
+# Usage: sudo ./touch-rotate.sh {normal|right|inverted|left}
 
 DEVICE="ILITEK Multi-Touch-V5000"
-EVENT="/dev/input/event7"
+HWDB_FILE="/etc/udev/hwdb.d/99-touchscreen.hwdb"
 
 case "$1" in
   normal)
@@ -23,10 +24,21 @@ case "$1" in
     ;;
 esac
 
-echo "Applying rotation '$1' to $DEVICE ($EVENT)"
-sudo udevadm hwdb --update
-sudo udevadm trigger $EVENT
-sudo libinput debug-events --device=$EVENT --verbose | head -n 5 &
-sleep 1
-sudo kill $!
-sudo libinput debug-events --device=$EVENT --set-calibration-matrix=$MATRIX
+echo ">>> Applying rotation '$1' to $DEVICE"
+echo ">>> Writing hwdb file: $HWDB_FILE"
+
+cat <<EOF | sudo tee $HWDB_FILE >/dev/null
+evdev:name:${DEVICE}*
+ LIBINPUT_CALIBRATION_MATRIX=$MATRIX
+EOF
+
+echo ">>> Updating hwdb database..."
+sudo systemd-hwdb update
+
+echo ">>> Reloading udev rules for touchscreen..."
+EVENT=$(grep -l "$DEVICE" /proc/bus/input/devices | grep event | sed 's/.*event//;s/:.*//')
+if [ -n "$EVENT" ]; then
+  sudo udevadm trigger /dev/input/event$EVENT
+fi
+
+echo ">>> Done. Rotation '$1' is now persistent across reboots."
